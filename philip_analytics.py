@@ -12,6 +12,8 @@ The four types of data sources are: CSV, Excel, JSON, and Text.
 import csv
 import json     
 import pathlib as pl
+import re
+from collections import Counter
 import requests 
 import pandas as pd
 import pathlib 
@@ -52,6 +54,20 @@ def write_csv_file(folder_name:str, filename:str, binary_data:bytes) -> None:
     except IOError as e:
         print(f"Error writing csv data to {file_path}: {e}")  
 
+def display_first_five_lines_csv(folder_name: str, filename: str) -> None:
+    """Open a CSV file and display the first five lines using pandas."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: display_first_five_lines with file_path={file_path}")
+    try:
+        df = pd.read_csv(file_path)
+        print(df.head(5))
+    except IOError as e:
+        print(f"Error reading csv file {file_path}: {e}")
+    except pd.errors.EmptyDataError as e:
+        print(f"Error: No data in csv file {file_path}: {e}")
+    except pd.errors.ParserError as e:
+        print(f"Error parsing csv file {file_path}: {e}")
+
 ######################
 # Function Definitions Excel
 ######################
@@ -78,6 +94,20 @@ def write_excel_file(folder_name:str, filename:str, binary_data:bytes) -> None:
         print(f"SUCCESS: Excel data saved to {file_path}")
     except IOError as e:
         print(f"Error writing Excel data to {file_path}: {e}")    
+
+def display_first_five_lines_xlsx(folder_name: str, filename: str) -> None:
+    """Open an XLSX file and display the first five lines using pandas."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: display_first_five_lines_xlsx with file_path={file_path}")
+    try:
+        df = pd.read_excel(file_path)
+        print(df.head(5))
+    except IOError as e:
+        print(f"Error reading xlsx file {file_path}: {e}")
+    except pd.errors.EmptyDataError as e:
+        print(f"Error: No data in xlsx file {file_path}: {e}")
+    except pd.errors.ParserError as e:
+        print(f"Error parsing xlsx file {file_path}: {e}")
 
 ######################
 # Function Definitions JSON
@@ -106,6 +136,19 @@ def write_json_file(folder_name:str, filename:str, json_data) -> None:
     except IOError as e:
         print(f"Error writing JSON data to {file_path}: {e}")
 
+def display_json_data(folder_name: str, filename: str) -> None:
+    """Read and display JSON data from a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: display_json_data with file_path={file_path}")
+    try:
+        with file_path.open('r', encoding='utf-8') as file:
+            data = json.load(file)
+            print(json.dumps(data, indent=4, sort_keys=True))
+    except IOError as e:
+        print(f"Error reading json file {file_path}: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding json file {file_path}: {e}")
+
 ######################
 # Function Definitions Text
 ######################
@@ -133,6 +176,24 @@ def write_txt_file(folder_name:str, filename:str, binary_data:bytes) -> None:
     except IOError as e:
         print(f"Error writing txt data to {file_path}: {e}")  
 
+def find_top_10_common_words(folder_name: str, filename: str) -> None:
+    """Find the top 10 most common words in a TXT file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: find_top_10_common_words with file_path={file_path}")
+    try:
+        with file_path.open('r', encoding='utf-8') as file:
+            text = file.read()
+            # Use regex to find words and convert to lowercase
+            words = re.findall(r'\b\w+\b', text.lower())
+            # Count the frequency of each word
+            word_counts = Counter(words)
+            # Get the 10 most common words
+            common_words = word_counts.most_common(10)
+            print("Top 10 most common words:")
+            for word, count in common_words:
+                print(f"{word}: {count}")
+    except IOError as e:
+        print(f"Error reading txt file {file_path}: {e}")
 
 ######################
 # Main Function
@@ -157,15 +218,22 @@ def main():
 
     # Web locations of different types of data to fetch
     excel_url:str = 'https://github.com/prasertcbs/basic-dataset/raw/master/cars.xlsx' 
-    json_url:str = 'https://raw.githubusercontent.com/ozlerhakan/mongodb-json-files/master/datasets/students.json'
+    json_url:str = 'http://api.open-notify.org/astros.json'
     txt_url:str = 'https://raw.githubusercontent.com/mmcky/nyu-econ-370/master/notebooks/data/book-war-and-peace.txt'
     csv_url:str = 'https://raw.githubusercontent.com/jack-madison/Cycling-Data/main/losangeles_ca/bike_share/la_daily_bikeshare.csv' 
 
     # Fetch data files - provide the fetched file names
     fetch_excel_file(fetched_folder_name, "cars.xlsx", excel_url)
-    fetch_json_file(fetched_folder_name, "students.json", json_url)
+    fetch_json_file(fetched_folder_name, "astros.json", json_url)
     fetch_txt_file(fetched_folder_name, "warpeace.txt", txt_url)
     fetch_csv_file(fetched_folder_name, "bikes.csv", csv_url)
+
+    # Display the first five lines of the fetched CSV file
+    display_first_five_lines_csv(fetched_folder_name, "bikes.csv")
+    #display_first_five_lines_xlsx(fetched_folder_name, "cars.xlsx")
+    find_top_10_common_words(fetched_folder_name, "warpeace.txt")
+    display_json_data(fetched_folder_name, "astros.json")
+
 
     # End of main execution
     print("\n#####################################")
