@@ -14,7 +14,9 @@ import json
 import pathlib as pl
 import requests 
 import pandas as pd
+import pathlib 
 import utils_philip
+import philip_project
 
 
 ######################
@@ -28,119 +30,117 @@ fetched_folder_name = "fetched"
 ######################
 
 def fetch_csv_file(folder_name:str, filename:str, url:str) -> None:
-    '''
-    This function fetches a CSV file from the internet and saves it to a local folder.
-    '''
-    # Fetch the CSV file from the internet
-    response = requests.get(url)
-    
-    # Check if the response is successful
-    if response.status_code == 200:
-        # Save the CSV file to the local folder
-        with open(f'{folder_name}/{filename}', 'wb') as file:
-            file.write(response.content)
-    else:
-        print(f'Failed to fetch the CSV file from {url}')
+    """Fetch csv data from the given URL and write it to a file."""
+    print(f"FUNCTION CALLED: fetch_csv_file with folder_name={folder_name}, filename={filename}, url={url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  
+        write_csv_file(folder_name, filename, response.content)
+        print(f"SUCCESS: Csv file fetched and saved as {filename}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching csv data: {e}")
 
-def write_csv_file(folder_name:str, filename:str, string_data:str) -> None:
-    '''
-    This function writes a CSV file to a local folder.
-    '''
-    # Save the CSV file to the local folder
-    with open(f'{folder_name}/{filename}', 'w') as file:
-        file.write(string_data)
+def write_csv_file(folder_name:str, filename:str, binary_data:bytes) -> None:
+    """Write csv binary_data to a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: write_csv_file with file_path={file_path}")
+    try:
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open('wb') as file:
+            file.write(binary_data)
+        print(f"SUCCESS: csv data saved to {file_path}")
+    except IOError as e:
+        print(f"Error writing csv data to {file_path}: {e}")  
 
 ######################
 # Function Definitions Excel
 ######################
 
 def fetch_excel_file(folder_name:str, filename:str, url:str) -> None:
-    '''
-    This function fetches an Excel file from the internet and saves it to a local folder.
-    '''
-    # Fetch the Excel file from the internet
-    response = requests.get(url)
-    
-    # Check if the response is successful
-    if response.status_code == 200:
-        # Save the Excel file to the local folder
-        with open(f'{folder_name}/{filename}', 'wb') as file:
-            file.write(response.content)
-    else:
-        print(f'Failed to fetch the Excel file from {url}')
+    """Fetch Excel data from the given URL and write it to a file."""
+    print(f"FUNCTION CALLED: fetch_excel_file with folder_name={folder_name}, filename={filename}, url={url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  
+        write_excel_file(folder_name, filename, response.content)
+        print(f"SUCCESS: Excel file fetched and saved as {filename}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching Excel data: {e}")
+
+def write_excel_file(folder_name:str, filename:str, binary_data:bytes) -> None:
+    """Write Excel binary_data to a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: write_excel_file with file_path={file_path}")
+    try:
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open('wb') as file:
+            file.write(binary_data)
+        print(f"SUCCESS: Excel data saved to {file_path}")
+    except IOError as e:
+        print(f"Error writing Excel data to {file_path}: {e}")    
 
 ######################
 # Function Definitions JSON
 ######################
 
 def fetch_json_file(folder_name:str, filename:str, url:str) -> None:
-    '''
-    This function fetches a JSON file from the internet and saves it to a local folder.
-    '''
-    # Fetch the JSON file from the internet
-    response = requests.get(url)
-    
-    # Check if the response is successful
-    if response.status_code == 200:
-        # Save the JSON file to the local folder
-        with open(f'{folder_name}/{filename}', 'wb') as file:
-            file.write(response.content)
-    else:
-        print(f'Failed to fetch the JSON file from {url}')
+    """Fetch JSON data from the given URL and write it to a file."""
+    print(f"FUNCTION CALLED: fetch_json_file with folder_name={folder_name}, filename={filename}, url={url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  
+        write_json_file(folder_name, filename, response.json())
+        print(f"SUCCESS: JSON file fetched and saved as {filename}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching JSON data: {e}")
+
+def write_json_file(folder_name:str, filename:str, json_data) -> None:
+    """Write JSON data to a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: write_json_file with file_path={file_path}")
+    try:
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open('w') as file:
+            json.dump(json_data, file, indent=4)
+        print(f"SUCCESS: JSON data saved to {file_path}")
+    except IOError as e:
+        print(f"Error writing JSON data to {file_path}: {e}")
 
 ######################
 # Function Definitions Text
 ######################
 
-def fetch_text_file(folder_name:str, filename:str, url:str) -> None:
-    '''
-    This function fetches a text file from the internet and saves it to a local folder.
-    '''
-    # Fetch the text file from the internet
-    response = requests.get(url)
-    
-    # Check if the response is successful
-    if response.status_code == 200:
-        # Save the text file to the local folder
-        with open(f'{folder_name}/{filename}', 'wb') as file:
-            file.write(response.content)
-    else:
-        print(f'Failed to fetch the text file from {url}')
+def fetch_txt_file(folder_name:str, filename:str, url:str) -> None:
+    """Fetch text data from the given URL and write it to a file."""
+    print(f"FUNCTION CALLED: fetch_csv_file with folder_name={folder_name}, filename={filename}, url={url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  
+        write_txt_file(folder_name, filename, response.content)
+        print(f"SUCCESS: Text file fetched and saved as {filename}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching txt data: {e}")
 
- # Extract words from the text file and count occurrences of the most common 10 words
-def count_words_in_text_file(folder_name:str, filename:str) -> None:
-    '''
-    This function counts the occurrences of the most common 10 words in a text file.
-    '''
-    # Read the text file
-    with open(f'{folder_name}/{filename}', 'r') as file:
-        text = file.read()
-    
-    # Split the text into words
-    words = text.split()
-    
-    # Count the occurrences of each word
-    word_counts = {}
-    for word in words:
-        if word in word_counts:
-            word_counts[word] += 1
-        else:
-            word_counts[word] = 1
-    
-    # Sort the words by their counts in descending order
-    sorted_word_counts = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
-    
-    # Print the most common 10 words
-    for word, count in sorted_word_counts[:10]:
-        print(f'{word}: {count}')
+def write_txt_file(folder_name:str, filename:str, binary_data:bytes) -> None:
+    """Write txt binary_data to a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: write_txt_file with file_path={file_path}")
+    try:
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open('wb') as file:
+            file.write(binary_data)
+        print(f"SUCCESS: txt data saved to {file_path}")
+    except IOError as e:
+        print(f"Error writing txt data to {file_path}: {e}")  
+
 
 ######################
 # Main Function
 ######################
 
 def main():
-
- ''' Main function to demonstrate module capabilities. '''
+    
+    ''' Main function to demonstrate module capabilities. '''
 
     # Start of main execution
     print("#####################################")
@@ -153,21 +153,19 @@ def main():
     # Reuse  create_folders_from_list() from imported module to make a folder for fetched files
     # We set the name as a global variable so the whole module can use it. 
     # Make sure we provide a LIST when using our function
-    # TODO: Change this to use your module function and uncomment
-    case_project_setup.create_folders_from_list([fetched_folder_name])
+    philip_project.create_folders_from_list([fetched_folder_name])
 
     # Web locations of different types of data to fetch
-    # TODO: Optional find different urls for 4 different types of data                               
-    excel_url:str = 'https://raw.githubusercontent.com/denisecase/datafun-03-analytics/main/hosted/Feedback.xlsx' 
-    json_url:str = 'http://api.open-notify.org/astros.json'
-    txt_url:str = 'https://raw.githubusercontent.com/denisecase/datafun-03-analytics/main/hosted/romeo.txt'
-    csv_url:str = 'https://raw.githubusercontent.com/MainakRepositor/Datasets/master/World%20Happiness%20Data/2020.csv' 
+    excel_url:str = 'https://github.com/prasertcbs/basic-dataset/raw/master/cars.xlsx' 
+    json_url:str = 'https://raw.githubusercontent.com/ozlerhakan/mongodb-json-files/master/datasets/students.json'
+    txt_url:str = 'https://raw.githubusercontent.com/mmcky/nyu-econ-370/master/notebooks/data/book-war-and-peace.txt'
+    csv_url:str = 'https://raw.githubusercontent.com/jack-madison/Cycling-Data/main/losangeles_ca/bike_share/la_daily_bikeshare.csv' 
 
     # Fetch data files - provide the fetched file names
-    fetch_excel_file(fetched_folder_name, "feedback.xlsx", excel_url)
-    fetch_json_file(fetched_folder_name, "astros.json", json_url)
-    fetch_txt_file(fetched_folder_name, "romeo.txt", txt_url)
-    fetch_csv_file(fetched_folder_name, "2020_happiness.csv", csv_url)
+    fetch_excel_file(fetched_folder_name, "cars.xlsx", excel_url)
+    fetch_json_file(fetched_folder_name, "students.json", json_url)
+    fetch_txt_file(fetched_folder_name, "warpeace.txt", txt_url)
+    fetch_csv_file(fetched_folder_name, "bikes.csv", csv_url)
 
     # End of main execution
     print("\n#####################################")
