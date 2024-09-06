@@ -19,7 +19,8 @@ import pandas as pd
 import pathlib 
 import utils_philip
 import philip_project
-
+import matplotlib.pyplot as plt
+import openpyxl
 
 ######################
 # Declare Global Variables
@@ -68,6 +69,34 @@ def display_first_five_lines_csv(folder_name: str, filename: str) -> None:
     except pd.errors.ParserError as e:
         print(f"Error parsing csv file {file_path}: {e}")
 
+def create_histogram_for_bikes(folder_name: str, filename: str) -> None:
+    """Create a histogram for date and ride_count using the bikes.csv file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: create_histogram_for_bikes with file_path={file_path}")
+    try:
+        # Read the CSV file
+        df = pd.read_csv(file_path)
+        
+        # Convert the 'date' column to datetime format if necessary
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+        
+        # Create a histogram for the 'ride_count' column
+        plt.figure(figsize=(10, 6))
+        plt.hist(df['ride_count'], bins=30, edgecolor='black')
+        plt.title('Histogram of Ride Count')
+        plt.xlabel('Ride Count')
+        plt.ylabel('Frequency')
+        plt.grid(True)
+        plt.show()
+        
+    except IOError as e:
+        print(f"Error reading csv file {file_path}: {e}")
+    except pd.errors.EmptyDataError as e:
+        print(f"Error: No data in csv file {file_path}: {e}")
+    except pd.errors.ParserError as e:
+        print(f"Error parsing csv file {file_path}: {e}")
+
 ######################
 # Function Definitions Excel
 ######################
@@ -109,6 +138,25 @@ def display_first_five_lines_xlsx(folder_name: str, filename: str) -> None:
     except pd.errors.ParserError as e:
         print(f"Error parsing xlsx file {file_path}: {e}")
 
+def convert_xlsx_to_csv(folder_name: str, xlsx_filename: str, csv_filename: str) -> None:
+    """Convert an XLSX file to a CSV file."""
+    xlsx_file_path = pathlib.Path(folder_name).joinpath(xlsx_filename)
+    csv_file_path = pathlib.Path(folder_name).joinpath(csv_filename)
+    print(f"FUNCTION CALLED: convert_xlsx_to_csv with xlsx_file_path={xlsx_file_path} and csv_file_path={csv_file_path}")
+    try:
+        # Read the XLSX file
+        df = pd.read_excel(xlsx_file_path)
+        
+        # Write the DataFrame to a CSV file
+        df.to_csv(csv_file_path, index=False)
+        print(f"Successfully converted {xlsx_filename} to {csv_filename}")
+    except IOError as e:
+        print(f"Error reading or writing file: {e}")
+    except pd.errors.EmptyDataError as e:
+        print(f"Error: No data in xlsx file {xlsx_file_path}: {e}")
+    except pd.errors.ParserError as e:
+        print(f"Error parsing xlsx file {xlsx_file_path}: {e}")
+
 ######################
 # Function Definitions JSON
 ######################
@@ -144,6 +192,24 @@ def display_json_data(folder_name: str, filename: str) -> None:
         with file_path.open('r', encoding='utf-8') as file:
             data = json.load(file)
             print(json.dumps(data, indent=4, sort_keys=True))
+    except IOError as e:
+        print(f"Error reading json file {file_path}: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding json file {file_path}: {e}")
+
+def display_json_data_sorted_by_craft(folder_name: str, filename: str) -> None:
+    """Read, sort by craft, and display JSON data from a file."""
+    file_path = pathlib.Path(folder_name).joinpath(filename)
+    print(f"FUNCTION CALLED: display_json_data_sorted_by_craft with file_path={file_path}")
+    try:
+        with file_path.open('r', encoding='utf-8') as file:
+            data = json.load(file)
+            # Sort the people by craft
+            if "people" in data:
+                data["people"] = sorted(data["people"], key=lambda x: x["craft"])
+            # Pretty-print the sorted JSON data
+            sorted_data = json.dumps(data, indent=4, sort_keys=True)
+            print(sorted_data)
     except IOError as e:
         print(f"Error reading json file {file_path}: {e}")
     except json.JSONDecodeError as e:
@@ -230,10 +296,21 @@ def main():
 
     # Display the first five lines of the fetched CSV file
     display_first_five_lines_csv(fetched_folder_name, "bikes.csv")
-    #display_first_five_lines_xlsx(fetched_folder_name, "cars.xlsx")
+    
+    #display_first_five_lines_xlsx(fetched_folder_name, "cars.xlsx") - I can't seem to make this work see the following
+    #Convert the XLSX to CSV and display the first five lines of the CSV file
+    convert_xlsx_to_csv(fetched_folder_name, "cars.xlsx", "cars.csv")
+    display_first_five_lines_csv(fetched_folder_name, "cars.csv")
+    
+    # Find the top 10 most common words in the fetched text file
     find_top_10_common_words(fetched_folder_name, "warpeace.txt")
-    display_json_data(fetched_folder_name, "astros.json")
+    
+    #display_json_data(fetched_folder_name, "astros.json")
+    display_json_data_sorted_by_craft(fetched_folder_name, "astros.json")
 
+    # Create a histogram for the bikes.csv file
+    create_histogram_for_bikes(fetched_folder_name, "bikes.csv")
+    
 
     # End of main execution
     print("\n#####################################")
